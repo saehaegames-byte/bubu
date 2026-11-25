@@ -30,20 +30,49 @@
     padding: 18px 24px;
     border-radius: 14px;
     box-shadow: 0 4px 14px rgba(0,0,0,.18);
+    border: 0;
+    width: 100%;
+    cursor: pointer;
   }
-  .hint { font-size: 14px; color: #666; margin-top: 22px; }
-  .small { font-size: 13px; color: #888; margin-top: 10px; }
+  .btn.light { background: #ffffff; color: #01875f; border: 2px solid #01875f; box-shadow: none; font-size: 17px; padding: 14px 20px; margin-top: 14px; }
+  .small { font-size: 13px; color: #888; margin-top: 14px; }
   .small a { color: #888; }
+
+  /* Inside TikTok: big "open in browser" guide */
+  #tt { display: none; }
+  .arrow {
+    position: fixed;
+    top: 6px;
+    right: 14px;
+    font-size: 64px;
+    line-height: 1;
+    color: #e8384f;
+    animation: bob 1s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .steps { font-size: 22px; font-weight: 700; margin: 70px 0 10px; line-height: 1.4; }
+  .steps b { color: #e8384f; }
+  .why { font-size: 15px; color: #555; margin-bottom: 24px; }
+  #copied { display: none; color: #01875f; font-size: 14px; margin-top: 8px; }
 </style>
 </head>
 <body>
-<div class="box">
+
+<!-- Shown inside TikTok (TikTok blocks opening the Play Store app from here) -->
+<div id="tt" class="box">
+  <div class="arrow">↗</div>
+  <h1>Bubu Dudu Snow Surf 🤍🤎</h1>
+  <div class="steps">Tap <b>⋯</b> at the top<br>→ <b>Open in browser</b></div>
+  <div class="why">Then the game opens in Google Play 🐻</div>
+  <button id="copy" class="btn light">Or copy link → paste in Chrome</button>
+  <div id="copied">Copied! Open Chrome and paste it 👍</div>
+</div>
+
+<!-- Shown everywhere else (Chrome etc.) -->
+<div id="normal" class="box">
   <h1>Bubu Dudu Snow Surf 🤍🤎</h1>
   <p>Help Dudu save Bubu! Free on Google Play.</p>
-
   <a id="open" class="btn" href="#">Open in Google Play</a>
-
-  <div class="hint">Not opening? Tap <b>⋯</b> at the top → <b>Open in browser</b></div>
   <div class="small" id="ios" style="display:none">Android only for now 🐻</div>
   <div class="small"><a id="web" href="#">Open the web page instead</a></div>
 </div>
@@ -62,17 +91,36 @@
                   "#Intent;scheme=market;package=com.android.vending;" +
                   "S.browser_fallback_url=" + encodeURIComponent(webUrl) + ";end";
 
-  var isAndroid = /Android/i.test(navigator.userAgent);
-  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var ua = navigator.userAgent;
+  var isAndroid = /Android/i.test(ua);
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var inTikTok = /musical_ly|BytedanceWebview|TikTok|trill_/i.test(ua);
 
-  var openBtn = document.getElementById("open");
-  openBtn.href = isAndroid ? intentUrl : webUrl;
-  document.getElementById("web").href = webUrl;
-  if (isIOS) document.getElementById("ios").style.display = "block";
+  if (inTikTok) {
+    // TikTok blocks the jump to the Play Store app: show the "open in browser" guide instead (no error popup).
+    document.getElementById("normal").style.display = "none";
+    document.getElementById("tt").style.display = "block";
 
-  // Try to open the Play Store app straight away (some browsers only allow it after a tap: then the button does it).
-  if (isAndroid) {
-    setTimeout(function () { window.location.href = intentUrl; }, 300);
+    // This page's own address, so it can be pasted into Chrome (Chrome then opens the Play Store app).
+    var pageUrl = location.href.split("#")[0];
+    document.getElementById("copy").onclick = function () {
+      var done = function () { document.getElementById("copied").style.display = "block"; };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(pageUrl).then(done, function () { prompt("Copy this link:", pageUrl); });
+      } else {
+        prompt("Copy this link:", pageUrl);
+      }
+    };
+  } else {
+    var openBtn = document.getElementById("open");
+    openBtn.href = isAndroid ? intentUrl : webUrl;
+    document.getElementById("web").href = webUrl;
+    if (isIOS) document.getElementById("ios").style.display = "block";
+
+    // In a normal browser (Chrome): go straight to the Play Store app.
+    if (isAndroid) {
+      setTimeout(function () { window.location.href = intentUrl; }, 300);
+    }
   }
 </script>
 </body>
