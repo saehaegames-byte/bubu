@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bubu Dudu Snow Surf</title>
+<meta name="description" content="Help Dudu save Bubu! Free on Google Play.">
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #bfe3ff 0%, #ffffff 100%);
+    font-family: -apple-system, Roboto, "Segoe UI", Arial, sans-serif;
+    color: #2b2b2b;
+    text-align: center;
+  }
+  .box { padding: 32px 24px; max-width: 360px; }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  p { font-size: 17px; margin: 0 0 28px; }
+  .btn {
+    display: block;
+    background: #01875f;
+    color: #fff;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 18px 24px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  }
+  .hint { font-size: 14px; color: #666; margin-top: 22px; }
+  .small { font-size: 13px; color: #888; margin-top: 10px; }
+  .small a { color: #888; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Bubu Dudu Snow Surf 🤍🤎</h1>
+  <p>Help Dudu save Bubu! Free on Google Play.</p>
+
+  <a id="open" class="btn" href="#">Open in Google Play</a>
+
+  <div class="hint">Not opening? Tap <b>⋯</b> at the top → <b>Open in browser</b></div>
+  <div class="small" id="ios" style="display:none">Android only for now 🐻</div>
+  <div class="small"><a id="web" href="#">Open the web page instead</a></div>
+</div>
+
+<script>
+  // Game + tracking. utm_source=tiktok, utm_medium=bio, utm_campaign=bio (shows in Play Console).
+  var PKG = "com.saehaegames.bubududusnowsurf";
+  var REFERRER = "utm_source=tiktok&utm_medium=bio&utm_campaign=bio";
+
+  var webUrl = "https://play.google.com/store/apps/details?id=" + PKG +
+               "&referrer=" + encodeURIComponent(REFERRER);
+
+  // Opens the Play Store app directly (not the web page). Falls back to the web page if it can't.
+  var intentUrl = "intent://details?id=" + PKG +
+                  "&referrer=" + encodeURIComponent(REFERRER) +
+                  "#Intent;scheme=market;package=com.android.vending;" +
+                  "S.browser_fallback_url=" + encodeURIComponent(webUrl) + ";end";
+
+  var isAndroid = /Android/i.test(navigator.userAgent);
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  var openBtn = document.getElementById("open");
+  openBtn.href = isAndroid ? intentUrl : webUrl;
+  document.getElementById("web").href = webUrl;
+  if (isIOS) document.getElementById("ios").style.display = "block";
+
+  // Try to open the Play Store app straight away (some browsers only allow it after a tap: then the button does it).
+  if (isAndroid) {
+    setTimeout(function () { window.location.href = intentUrl; }, 300);
+  }
+</script>
+</body>
+</html>
