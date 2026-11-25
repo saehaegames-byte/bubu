@@ -55,6 +55,17 @@
   .why { font-size: 15px; color: #555; margin-bottom: 24px; }
   #copied { display: none; color: #01875f; font-size: 14px; margin-top: 8px; }
 </style>
+<!-- Google Analytics (Realtime shows visits within seconds) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZKVZE34Q90"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZKVZE34Q90');
+  // Which browser they opened the link in (tiktok_browser / other_browser)
+  var _inTT = /musical_ly|BytedanceWebview|TikTok|trill_/i.test(navigator.userAgent);
+  gtag('event', 'link_opened', { opened_in: _inTT ? 'tiktok_browser' : 'other_browser' });
+</script>
 </head>
 <body>
 
@@ -104,6 +115,7 @@
     // This page's own address, so it can be pasted into Chrome (Chrome then opens the Play Store app).
     var pageUrl = location.href.split("#")[0];
     document.getElementById("copy").onclick = function () {
+      gtag('event', 'copy_link_tap');
       var done = function () { document.getElementById("copied").style.display = "block"; };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(pageUrl).then(done, function () { prompt("Copy this link:", pageUrl); });
@@ -116,10 +128,15 @@
     openBtn.href = isAndroid ? intentUrl : webUrl;
     document.getElementById("web").href = webUrl;
     if (isIOS) document.getElementById("ios").style.display = "block";
+    openBtn.addEventListener("click", function () { gtag('event', 'play_button_tap', { transport_type: 'beacon' }); });
+    document.getElementById("web").addEventListener("click", function () { gtag('event', 'web_link_tap', { transport_type: 'beacon' }); });
 
     // In a normal browser (Chrome): go straight to the Play Store app.
     if (isAndroid) {
-      setTimeout(function () { window.location.href = intentUrl; }, 300);
+      setTimeout(function () {
+        gtag('event', 'auto_open_play', { transport_type: 'beacon' });
+        window.location.href = intentUrl;
+      }, 800);
     }
   }
 </script>
