@@ -66,6 +66,22 @@
   var _inTT = /musical_ly|BytedanceWebview|TikTok|trill_/i.test(navigator.userAgent);
   gtag('event', 'link_opened', { opened_in: _inTT ? 'tiktok_browser' : 'other_browser' });
 </script>
+<!-- GoatCounter: every visit with country, shows up within seconds at https://bububio.goatcounter.com -->
+<script data-goatcounter="https://bububio.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+  // Send a GoatCounter event (waits until the counter script has loaded).
+  function gcEvent(name) {
+    var tries = 0;
+    (function send() {
+      if (window.goatcounter && window.goatcounter.count) {
+        window.goatcounter.count({ path: name, title: name, event: true });
+      } else if (tries++ < 20) {
+        setTimeout(send, 150);
+      }
+    })();
+  }
+  gcEvent(/musical_ly|BytedanceWebview|TikTok|trill_/i.test(navigator.userAgent) ? 'opened-in-tiktok' : 'opened-in-other-browser');
+</script>
 </head>
 <body>
 
@@ -115,7 +131,7 @@
     // This page's own address, so it can be pasted into Chrome (Chrome then opens the Play Store app).
     var pageUrl = location.href.split("#")[0];
     document.getElementById("copy").onclick = function () {
-      gtag('event', 'copy_link_tap');
+      gtag('event', 'copy_link_tap'); gcEvent('copy-link-tap');
       var done = function () { document.getElementById("copied").style.display = "block"; };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(pageUrl).then(done, function () { prompt("Copy this link:", pageUrl); });
@@ -128,13 +144,13 @@
     openBtn.href = isAndroid ? intentUrl : webUrl;
     document.getElementById("web").href = webUrl;
     if (isIOS) document.getElementById("ios").style.display = "block";
-    openBtn.addEventListener("click", function () { gtag('event', 'play_button_tap', { transport_type: 'beacon' }); });
-    document.getElementById("web").addEventListener("click", function () { gtag('event', 'web_link_tap', { transport_type: 'beacon' }); });
+    openBtn.addEventListener("click", function () { gtag('event', 'play_button_tap', { transport_type: 'beacon' }); gcEvent('play-button-tap'); });
+    document.getElementById("web").addEventListener("click", function () { gtag('event', 'web_link_tap', { transport_type: 'beacon' }); gcEvent('web-link-tap'); });
 
     // In a normal browser (Chrome): go straight to the Play Store app.
     if (isAndroid) {
       setTimeout(function () {
-        gtag('event', 'auto_open_play', { transport_type: 'beacon' });
+        gtag('event', 'auto_open_play', { transport_type: 'beacon' }); gcEvent('auto-open-play');
         window.location.href = intentUrl;
       }, 800);
     }
